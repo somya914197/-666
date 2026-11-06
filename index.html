@@ -1,0 +1,142 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ธรณีพิบัติภัย 3D</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet"><style>
+:root{color-scheme:dark;font-size:16px;line-height:1.65;color:#dfe9f3;background:#07131f}*{box-sizing:border-box}
+body{margin:0;font-family:'Noto Sans Thai',Tahoma,sans-serif;background:radial-gradient(1000px 600px at 8% -8%,rgba(200,110,60,.25),transparent 60%),radial-gradient(900px 600px at 100% 6%,rgba(110,80,200,.26),transparent 60%),linear-gradient(180deg,#07131f,#0b1d2c 60%,#07131f);background-attachment:fixed;min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.09);color:#eaf3fc;padding:10px 16px;min-height:44px}button:hover{background:rgba(255,255,255,.17)}
+button:focus-visible,input:focus-visible{outline:3px solid #f5c969;outline-offset:3px}
+button.active,.primary{background:linear-gradient(135deg,#ffb27a,#f08a52);color:#3a1604;border-color:#ffb27a;font-weight:700}
+#app{max-width:1400px;margin:auto;padding:28px 32px}h1{font-size:clamp(28px,4vw,44px);line-height:1.3;margin:8px 0}h2{font-size:26px;margin:10px 0 18px}h3{font-size:19px;margin:0 0 8px}p{margin:8px 0}
+.eyebrow{letter-spacing:1.8px;font-size:12px;color:#ffb27a;font-weight:700}.muted{font-size:13px;color:#93adc2}
+nav{display:flex;gap:10px;margin:22px 0}nav button{flex:1}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:26px}aside{align-self:start;position:sticky;top:16px}aside>button{display:flex;gap:12px;width:100%;margin-bottom:8px;text-align:left;font-size:14px}aside>button span{opacity:.7}
+.card,.lab{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);padding:22px;border-radius:18px;margin-bottom:18px;backdrop-filter:blur(14px);box-shadow:0 18px 44px -22px #000}.card p{color:#bdd0e1}
+.lab{background:linear-gradient(140deg,rgba(200,110,60,.16),rgba(30,45,90,.22))}
+.note{border-left:3px solid #eac472;padding:12px 16px;background:rgba(32,44,59,.8);border-radius:0 10px 10px 0;margin:14px 0;color:#d2deea;font-size:14px}
+.lab{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}.lab>.stage{position:sticky;top:12px}.lab>h3{grid-column:1/-1;margin:0}
+.control{display:block;margin:12px 0;font-size:14px;color:#bccfdf}.control div{display:flex;align-items:center;gap:16px}.control input{width:100%;accent-color:#ffb27a;min-height:36px}.control output{min-width:56px;text-align:center;background:#293e55;border-radius:8px;font-size:18px;color:#fff;padding:2px 6px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}.stats>div{padding:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;font-size:12px;color:#acc4d7}.stats b{display:block;font-size:19px;color:#ffc79e;margin-bottom:4px}
+.result{padding:12px;text-align:center;background:rgba(36,65,81,.8);border-radius:10px;font-size:18px;font-weight:700;color:#ffd2ad}
+.stage{position:relative;height:clamp(400px,66vh,620px);border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.14);background:radial-gradient(ellipse at 50% 15%,#37505f 0,#0b2330 62%,#06151e 100%);touch-action:none}
+.stage canvas{display:block;width:100%;height:100%;cursor:grab}.hotspots{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hs{position:absolute;left:0;top:0;width:30px;height:30px;min-height:0;padding:0;border-radius:50%;pointer-events:auto;font-weight:700;background:rgba(245,201,105,.95);color:#2b1d02;border:2px solid rgba(255,255,255,.65);animation:pulse 2.4s infinite}.hs.sel{background:#fff}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(245,201,105,.6)}70%{box-shadow:0 0 0 12px rgba(245,201,105,0)}100%{box-shadow:0 0 0 0 transparent}}
+.hud,.legend,.hotcard{position:absolute;background:rgba(6,21,30,.65);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.14);border-radius:12px;font-size:12px}
+.hud{left:12px;right:12px;top:10px;padding:6px 12px;display:flex;justify-content:space-between;gap:8px;align-items:center}.hud button{min-height:32px;padding:4px 12px;font-size:12px}.hud button.on{background:#ffb27a;color:#3a1604}
+.legend{left:12px;bottom:10px;padding:6px 12px;display:flex;gap:10px;flex-wrap:wrap;color:#a9c0d3;max-width:55%}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.hotcard{right:12px;bottom:10px;width:min(300px,calc(100% - 24px));padding:14px 18px;border-color:rgba(255,178,122,.55);background:rgba(8,26,38,.88);z-index:3;font-size:13px}.hotcard h4{margin:0 22px 6px 0;font-size:16px;color:#ffb27a}.hotcard p{margin:0;color:#c3d4e2}.hotcard .x{position:absolute;right:6px;top:4px;min-height:28px;width:28px;padding:0;border-radius:50%;background:transparent}
+.choice{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid #36516b;border-radius:10px;margin:8px 0;cursor:pointer}.choice:has(input:checked){background:rgba(255,178,122,.16);border-color:#ffb27a}.choice input{accent-color:#ffb27a}
+.quiz{display:grid;grid-template-columns:1fr 1fr;gap:18px}.quiz .card{margin:0}.good{color:#8ce8bd}.bad{color:#ffb0a0}
+@media(max-width:1000px){.lab{grid-template-columns:1fr}.lab>.stage{position:relative}.stage{height:clamp(340px,56vh,520px)}}
+@media(max-width:850px){#app{padding:16px}.layout{grid-template-columns:1fr}aside{position:static;display:flex;gap:8px;flex-wrap:wrap}aside>button{width:auto;flex:1 1 170px;margin:0}.quiz{grid-template-columns:1fr}}
+@media(max-width:500px){.legend,.hud>span{display:none}}
+@media(prefers-reduced-motion:reduce){.hs{animation:none}}
+</style><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script></head><body><div id="app"></div><script>
+'use strict';
+const $=id=>document.getElementById(id);
+let S={page:'learn',ch:0,done:[],ans:Array(10).fill(''),chk:Array(10).fill(null)},KEY='geohazard_3d_v1';
+try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&x.ans)S=x}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let V={};/* slider values */
+const C=0xffb27a;
+/* ---------- เนื้อหา 7 บท ---------- */
+const CH=[
+{n:'แผ่นดินไหว',h:'พลังงานที่สะสมตรงรอยเลื่อน',t:'การเคลื่อนที่ของแผ่นธรณีภาคทำให้หินตรงรอยเลื่อนสะสมพลังงาน เมื่อหินทนไม่ไหวจะเลื่อนตัวและปลดปล่อยพลังงานเป็นคลื่นไหวสะเทือน ได้แก่ คลื่นในตัวกลาง (P และ S) และคลื่นพื้นผิว (L และ R)',o:'ขนาด (Magnitude) วัดพลังงานด้วยมาตราริกเตอร์หรือโมเมนต์มาตรา ส่วนความรุนแรงวัดความเสียหายด้วยมาตราเมอร์คัลลี่ 12 ระดับ ค่าขนาดเพิ่ม 1 หน่วย พลังงานเพิ่มประมาณ 32 เท่า',s:[['ขนาดแผ่นดินไหว (M)',3,9,6,.1]],r:v=>`พลังงานมากกว่า M3 ≈ ${Math.round(Math.pow(31.6,v[0]-3)).toLocaleString('th-TH')} เท่า`,cam:15},
+{n:'ภูเขาไฟระเบิด',h:'แมกมาดันตัวขึ้นสู่ผิวโลก',t:'แมกมาจากใต้เปลือกโลกดันตัวขึ้นตามปล่อง ความดันและความหนืดกำหนดความรุนแรงของการปะทุ ภูเขาไฟพบมากที่วงแหวนไฟรอบแปซิฟิก แนวเทือกเขาแอลป์-หิมาลัย และจุดร้อน',o:'ผลกระทบสำคัญคือ ลาวา เถ้าถ่าน ก๊าซพิษ และโคลนภูเขาไฟ',s:[['ความดันแมกมา',1,10,5,1]],r:v=>v[0]<4?'ปะทุเบา ไอน้ำและก๊าซ':v[0]<8?'ปะทุปานกลาง เถ้าถ่านลอยสูง':'ปะทุรุนแรง เถ้าแผ่กว้าง',cam:15},
+{n:'สึนามิ',h:'คลื่นจากการแทนที่ของมวลน้ำ',t:'สึนามิเกิดจากมวลน้ำถูกแทนที่อย่างกะทันหัน เช่น แผ่นดินไหวใต้ทะเล ดินถล่ม หรือภูเขาไฟระเบิดใต้ทะเล ในน้ำลึกคลื่นเคลื่อนเร็วมากแต่สูงไม่มาก เมื่อเข้าน้ำตื้นความเร็วลดลงแต่ความสูงเพิ่มขึ้นอย่างรวดเร็ว',o:'ความเร็วคลื่นน้ำตื้น v ≈ √(g·d) ระบบเตือนภัยใช้ทุ่น DART และดาวเทียม',s:[['ความลึกน้ำ (เมตร)',20,5000,4000,20]],r:v=>`ความเร็ว ≈ ${Math.round(Math.sqrt(9.81*v[0])*3.6).toLocaleString('th-TH')} กม./ชม.`,cam:19},
+{n:'ดินถล่มและโคลนถล่ม',h:'เมื่อความลาดชันพบฝนสะสม',t:'ดินถล่มเกิดจากความลาดชัน ชนิดของหินและดิน ปริมาณน้ำฝนสะสมที่ทำให้ดินอิ่มน้ำ และการขาดพืชคลุมดิน น้ำทำให้ดินหนักขึ้นและแรงเสียดทานลดลง',o:'พื้นที่เสี่ยงในไทยคือจังหวัดที่มีภูเขาลาดชัน สัญญาณเตือนเบื้องต้น เช่น น้ำขุ่น ต้นไม้เอียง รอยแตกบนพื้นดิน',s:[['ความลาดชัน (องศา)',10,60,25,1],['ฝนสะสม (ระดับ)',0,10,3,1]],r:v=>{const k=v[0]*(1+v[1]*.07);return k>40?'เสี่ยงสูง ดินเคลื่อนตัว':k>30?'เสี่ยงปานกลาง':'เสี่ยงต่ำ'},cam:15},
+{n:'หลุมยุบและแผ่นดินทรุด',h:'ใต้ดินกลวง พื้นดินพัง',t:'หลุมยุบเกิดเมื่อหินปูนหรือโดโลไมต์ใต้ดินถูกน้ำใต้ดินกัดเซาะเป็นโพรง จนชั้นดินด้านบนรับน้ำหนักไม่ไหว ส่วนแผ่นดินทรุดมักเกิดจากการสูบน้ำบาดาลหรือน้ำผิวดินเกินพิกัดในเขตเมืองหรือที่ราบลุ่ม',o:'การสูบน้ำมากเกินไปทำให้ระดับน้ำใต้ดินลดลง ชั้นดินเสียแรงพยุงและโพรงขยายตัว',s:[['ระดับน้ำใต้ดินที่ลดลง',0,10,2,1]],r:v=>v[0]>=7?'พื้นดินยุบเป็นหลุม':v[0]>=4?'โพรงขยาย เสี่ยงยุบ':'โพรงเล็ก ยังทรงตัว',cam:14},
+{n:'การกัดเซาะชายฝั่ง',h:'คลื่น ลม กระแสน้ำ และมนุษย์',t:'ชายฝั่งถูกกัดเซาะด้วยคลื่น ลม และกระแสน้ำ กิจกรรมของมนุษย์เร่งปัญหา เช่น สร้างเขื่อนหรือท่าเรือที่ขวางการเคลื่อนที่ของตะกอน และการบุกรุกป่าชายเลน',o:'ป่าชายเลนช่วยลดพลังงานคลื่นและยึดตะกอน จึงชะลอการถอยร่นของแนวชายฝั่ง',s:[['ความหนาแน่นป่าชายเลน',0,10,2,1]],r:v=>`ชายฝั่งถอยร่น ≈ ${((10-v[0])*.5).toFixed(1)} หน่วยต่อรอบปี (แบบจำลอง)`,cam:16},
+{n:'การรับมือภัยพิบัติ',h:'อ่านแผนที่เสี่ยง วางแผนอพยพ',t:'การรับมือเริ่มจากอ่านแผนที่ความเสี่ยงภัยพิบัติ สังเกตสัญญาณเตือนจากธรรมชาติ ปฏิบัติตนอย่างปลอดภัย และวางแผนอพยพไปยังที่สูงหรือศูนย์พักพิง',o:'ในแบบจำลอง ช่องสีแดงคือพื้นที่น้ำท่วม สีเหลืองคือพื้นที่เฝ้าระวัง สีเขียวคือพื้นที่ปลอดภัย',s:[['ระดับน้ำท่วม (เมตร)',0,6,2,.5]],r:v=>{const q=L7(v[0]);return `พื้นที่ปลอดภัย ${q}%`},cam:16}
+];
+function L7(f){let ok=0,all=0;for(let i=0;i<9;i++)for(let j=0;j<9;j++){all++;if(.3+i*.35+((j*7+i*3)%5)*.04>f+1)ok++}return Math.round(ok/all*100)}
+/* ---------- แบบฝึกหัด 10 ข้อ ---------- */
+const Q=[[0,'คลื่นไหวสะเทือนชนิดใดเป็นคลื่นในตัวกลาง?',['คลื่น P และ S','คลื่น L และ R','คลื่นวิทยุ'],0,'คลื่น P และ S เดินทางผ่านภายในโลก ส่วน L และ R เป็นคลื่นพื้นผิว'],
+[0,'มาตราใดวัดความรุนแรงของความเสียหาย?',['ริกเตอร์','โมเมนต์มาตรา','เมอร์คัลลี่'],2,'เมอร์คัลลี่ 12 ระดับ วัดความเสียหาย'],
+[0,'ขนาดแผ่นดินไหวเพิ่ม 1 หน่วย พลังงานเพิ่มประมาณกี่เท่า?',['2 เท่า','10 เท่า','32 เท่า'],2,'พลังงานเพิ่มประมาณ 10^1.5 ≈ 32 เท่า'],
+[1,'วงแหวนไฟ (Ring of Fire) อยู่บริเวณใด?',['มหาสมุทรแปซิฟิก','มหาสมุทรอาร์กติก','ทะเลทรายสะฮารา'],0,'ภูเขาไฟและแผ่นดินไหวเรียงตัวรอบขอบแปซิฟิก'],
+[1,'ปัจจัยใดกำหนดความรุนแรงการปะทุของภูเขาไฟ?',['สีของแมกมา','ความดันและความหนืด','ความสูงของภูเขา'],1,'ความดันและความหนืดของแมกมาควบคุมการปะทุ'],
+[2,'เมื่อสึนามิเข้าสู่น้ำตื้น คลื่นจะเปลี่ยนอย่างไร?',['เร็วขึ้นและเตี้ยลง','ช้าลงและสูงขึ้น','คงที่'],1,'ความเร็วลดลง ความสูงเพิ่มขึ้นอย่างรวดเร็ว'],
+[2,'อุปกรณ์ใดใช้เตือนภัยสึนามิกลางมหาสมุทร?',['ทุ่น DART','เครื่องวัดฝน','เสาอากาศวิทยุ'],0,'ทุ่น DART ตรวจวัดการเปลี่ยนแปลงความดันน้ำ'],
+[3,'น้ำฝนสะสมทำให้เกิดดินถล่มได้เพราะเหตุใด?',['ดินแห้งขึ้น','ดินหนักขึ้นและเสียดทานลดลง','ความลาดชันลดลง'],1,'ดินอิ่มน้ำมีน้ำหนักมากและยึดเกาะน้อยลง'],
+[4,'หินชนิดใดมักเกิดหลุมยุบจากน้ำใต้ดินกัดเซาะ?',['หินปูนหรือโดโลไมต์','หินแกรนิต','หินบะซอลต์'],0,'หินปูนและโดโลไมต์ละลายน้ำได้ง่าย เกิดโพรงใต้ดิน'],
+[5,'ป่าชายเลนช่วยลดการกัดเซาะชายฝั่งอย่างไร?',['ทำให้คลื่นแรงขึ้น','ลดพลังงานคลื่นและยึดตะกอน','ทำให้น้ำเค็มน้อยลง'],1,'รากและลำต้นลดพลังงานคลื่นและยึดตะกอน']];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* ---------- หน้าเว็บ ---------- */
+function render(){$('app').innerHTML=`<header><div class="eyebrow">EARTH SCIENCE STUDIO · GEOHAZARD</div><h1>ธรณีพิบัติภัย</h1><p class="muted">สำรวจภัยธรรมชาติจากกระบวนการทางธรณีวิทยา ผ่านแบบจำลอง 3 มิติ</p></header><nav>${[['learn','บทเรียน 7 บท'],['quiz','แบบฝึกหัด 10 ข้อ']].map(([k,a])=>`<button class="${S.page===k?'active':''}" onclick="S.page='${k}';save();render();scrollTo(0,0)">${a}</button>`).join('')}</nav><main id="main"></main><p class="muted" style="text-align:center;margin-top:30px">ไฟล์เดียว · ความคืบหน้าเก็บในเบราว์เซอร์นี้ · ภาพเป็นแบบจำลองเชิงแนวคิด ไม่ใช่มาตราส่วนจริง</p>`;S.page==='learn'?learn():quiz()}
+function learn(){const i=S.ch,c=CH[i];V=Object.fromEntries(c.s.map((x,k)=>[k,x[3]]));
+$('main').innerHTML=`<div class="layout"><aside>${CH.map((x,j)=>`<button class="${i===j?'active':''}" onclick="S.ch=${j};save();learn()"><span>${String(j+1).padStart(2,'0')}</span>${x.n} ${S.done.includes(j)?'✓':''}</button>`).join('')}<div class="note">เรียนแล้ว ${S.done.length}/7</div></aside><article><div class="eyebrow">LESSON ${i+1} / 7</div><h2>${c.n}</h2><div class="card"><h3>${c.h}</h3><p>${c.t}</p></div><div class="note">${c.o}</div><section class="lab"><h3>ทดลองและสังเกต</h3><div id="stg"></div><div><div id="ctl">${c.s.map((x,k)=>`<label class="control">${x[0]}<div><input type="range" min="${x[1]}" max="${x[2]}" step="${x[4]}" value="${x[3]}" oninput="V[${k}]=+this.value;upd()"><output id="o${k}">${x[3]}</output></div></label>`).join('')}</div><div class="result" id="res"></div></div></section><div class="actions"><button class="primary" onclick="if(!S.done.includes(${i}))S.done.push(${i});save();learn()">เรียนบทนี้แล้ว ✓</button> ${i<6?`<button onclick="S.ch=${i+1};save();learn()">บทถัดไป →</button>`:`<button onclick="S.page='quiz';save();render()">ไปทำแบบฝึกหัด →</button>`}</div></article></div>`;
+document.querySelector('.lab>div:last-child')&&0;mount();upd()}
+function upd(){const c=CH[S.ch],v=c.s.map((_,k)=>+V[k]);v.forEach((x,k)=>{const o=$('o'+k);if(o)o.textContent=x});$('res').textContent=c.r(v);rebuild()}
+function quiz(){const sc=S.chk.filter(x=>x&&x.ok).length;$('main').innerHTML=`<div class="eyebrow">PRACTICE / 10 QUESTIONS</div><h2>ฝึกคิดจากหลักฐาน</h2><div class="stats" style="grid-template-columns:repeat(2,1fr)"><div><b>${sc} / 10</b>คะแนนปัจจุบัน</div><div><b>${S.chk.filter(x=>x).length} / 10</b>ตรวจแล้ว</div></div><div class="quiz">${Q.map((q,i)=>`<section class="card"><div class="eyebrow">${i+1} / 10 · ${CH[q[0]].n}</div><h3>${q[1]}</h3>${q[2].map((o,j)=>`<label class="choice"><input type="radio" name="q${i}" ${S.ans[i]===String(j)?'checked':''} onchange="S.ans[${i}]='${j}';S.chk[${i}]=null;save();fb(${i})">${o}</label>`).join('')}<button class="primary" onclick="chk(${i})">ตรวจคำตอบ</button><div id="f${i}" aria-live="polite">${fbh(i)}</div></section>`).join('')}</div><p><button onclick="if(confirm('ล้างคำตอบทั้งหมด?')){S.ans=Array(10).fill('');S.chk=Array(10).fill(null);save();quiz()}">ล้างคำตอบ</button></p>`}
+function fbh(i){const c=S.chk[i];return c?`<p class="${c.ok?'good':'bad'}">${c.ok?'✓ ถูกต้อง':'✕ ยังไม่ถูกต้อง'}</p><p>เฉลย: ${Q[i][2][Q[i][3]]}<br>${Q[i][4]}</p>`:'<p class="muted">รอตรวจ</p>'}
+function fb(i){$('f'+i).innerHTML=fbh(i)}
+function chk(i){if(S.ans[i]===''){alert('เลือกคำตอบก่อน');return}S.chk[i]={ok:+S.ans[i]===Q[i][3]};save();quiz();document.getElementById('f'+i).scrollIntoView({block:'center'})}
+/* ---------- ฉาก 3 มิติ ---------- */
+let R,SC,CAM,CTL,G,ROOT,stage,hot,hudE,legE,cardE,cur=null,sel=-1,T=0,tk=[],lastCh=-1,rafOn=false;
+const sg=new THREE.SphereGeometry(1,24,16),bg=new THREE.BoxGeometry(1,1,1),cg=new THREE.CylinderGeometry(1,1,1,20),cn=new THREE.ConeGeometry(1,1,20);
+function init(){if(R||typeof THREE==='undefined'||!THREE.OrbitControls)return;try{R=new THREE.WebGLRenderer({antialias:true,alpha:true})}catch(e){R=null;return}
+R.setPixelRatio(Math.min(devicePixelRatio||1,2));R.shadowMap.enabled=true;SC=new THREE.Scene();CAM=new THREE.PerspectiveCamera(45,1,.1,300);CAM.position.set(0,6,16);
+CTL=new THREE.OrbitControls(CAM,R.domElement);CTL.enableDamping=true;CTL.minDistance=5;CTL.maxDistance=45;CTL.maxPolarAngle=Math.PI*.56;CTL.autoRotateSpeed=1.2;
+SC.add(new THREE.HemisphereLight(0xd6ecff,0x2a2018,.9));const sun=new THREE.DirectionalLight(0xffffff,1.1);sun.position.set(9,18,11);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-20,right:20,top:16,bottom:-16,far:70});SC.add(sun);
+const w=new THREE.PointLight(0xff9a60,.6,50);w.position.set(-12,7,-8);SC.add(w);
+ROOT=new THREE.Group();SC.add(ROOT);
+stage=document.createElement('div');stage.className='stage';stage.appendChild(R.domElement);
+hot=document.createElement('div');hot.className='hotspots';hudE=document.createElement('div');hudE.className='hud';legE=document.createElement('div');legE.className='legend';cardE=document.createElement('div');cardE.className='hotcard';cardE.hidden=true;
+stage.append(hot,hudE,legE,cardE);
+cardE.onclick=e=>{if(e.target.closest('[data-x]')){sel=-1;sync();cardE.hidden=true}};
+hudE.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.a==='rot'){CTL.autoRotate=!CTL.autoRotate;b.classList.toggle('on',CTL.autoRotate)}else{CTL.target.set(0,cur.y,0);CAM.position.set(0,cur.y+cur.cam*.4,cur.cam)}};
+if(window.ResizeObserver)new ResizeObserver(rs).observe(stage);addEventListener('resize',rs)}
+function rs(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;R.setSize(w,h,false);CAM.aspect=w/h;CAM.updateProjectionMatrix()}
+function mount(){init();const h=$('stg');if(!R){h.innerHTML='<div class="note">เบราว์เซอร์นี้แสดงฉาก 3 มิติไม่ได้ แต่ยังอ่านบทเรียนและทำแบบฝึกหัดได้</div>';return}h.appendChild(stage);rs();requestAnimationFrame(rs);if(!rafOn){rafOn=true;requestAnimationFrame(loop)}}
+const M=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.65},o||{}));
+function add(geo,c,p,s,o){const m=new THREE.Mesh(geo,M(c,o));m.position.set(...p);m.scale.set(...s);m.castShadow=m.receiveShadow=true;G.add(m);return m}
+const GL=o=>({transparent:true,opacity:o,depthWrite:false});
+function rebuild(){if(!R)return;const i=S.ch,v=CH[i].s.map((_,k)=>+V[k]);while(ROOT.children.length)ROOT.remove(ROOT.children[0]);G=new THREE.Group();ROOT.add(G);tk=[];hot.innerHTML='';
+cur=B[i](v);cur.an=cur.an||[];
+if(lastCh!==i){lastCh=i;sel=-1;CTL.target.set(0,cur.y,0);CAM.position.set(0,cur.y+cur.cam*.4,cur.cam)}
+cur.an.forEach((a,k)=>{const b=document.createElement('button');b.className='hs';b.textContent='i';b.setAttribute('aria-label',a.t);b.onclick=()=>{sel=sel===k?-1:k;sync();card()};hot.appendChild(b)});
+if(sel>=cur.an.length)sel=-1;sync();card();
+hudE.innerHTML=`<span>ลากเพื่อหมุน · ล้อเมาส์เพื่อซูม</span><div><button data-a="rot" class="${CTL.autoRotate?'on':''}">⟳ หมุนอัตโนมัติ</button> <button data-a="reset">⌂ รีเซ็ต</button></div>`;
+legE.innerHTML=cur.lg.map(l=>`<span><i style="background:#${l[0].toString(16).padStart(6,'0')}"></i>${l[1]}</span>`).join('')}
+function sync(){[...hot.children].forEach((b,j)=>b.classList.toggle('sel',j===sel))}
+function card(){const a=cur.an[sel];if(!a){cardE.hidden=true;return}cardE.innerHTML=`<button class="x" data-x aria-label="ปิด">✕</button><h4>${esc(a.t)}</h4><p>${esc(a.b)}</p>`;cardE.hidden=false}
+const v3=new THREE.Vector3();let last=performance.now();
+function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;if(!stage||!stage.isConnected||!stage.clientWidth||!cur)return;T+=dt;tk.forEach(f=>f(T));
+const w=stage.clientWidth,h=stage.clientHeight;[...hot.children].forEach((b,i)=>{const a=cur.an[i];if(!a)return;v3.set(...a.p).project(CAM);if(v3.z>1)b.hidden=true;else{b.hidden=false;b.style.transform=`translate(${(v3.x*.5+.5)*w}px,${(-v3.y*.5+.5)*h}px) translate(-50%,-50%)`}});
+CTL.update();R.render(SC,CAM)}
+/* ---------- ฉากของแต่ละบท ---------- */
+const B=[
+function(v){const m=v[0],A=(m-2)*.018;const L=add(bg,0x8a6a4a,[-3.05,.0,0],[6,1.6,5]),Rr=add(bg,0x9a7a56,[3.05,0,0],[6,1.6,5]);add(bg,0x5a3f2a,[0,-1.4,0],[12.2,1.2,5.2]);
+const f=add(sg,0xff4a3a,[0,-1.6,0],[.35,.35,.35],{emissive:0xff2a1a,emissiveIntensity:.8});
+const rings=[0,1,2].map(i=>{const r=new THREE.Mesh(new THREE.TorusGeometry(1,.035,8,64),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true}));r.rotation.x=Math.PI/2;r.position.y=.85;G.add(r);return r});
+tk.push(t=>{const s=Math.sin(t*28)*A;L.position.y=s;Rr.position.y=-s;L.position.z=-A*3;Rr.position.z=A*3;f.scale.setScalar(.3+.08*Math.sin(t*6));rings.forEach((r,i)=>{const u=(t*.35+i/3)%1;r.scale.setScalar(.3+u*(m*.7));r.material.opacity=1-u})});
+return{cam:15,y:0,lg:[[0xff4a3a,'จุดโฟกัส'],[0xffd27a,'คลื่นแผ่ออก'],[0x8a6a4a,'แผ่นดิน']],an:[{p:[0,-1.6,0],t:'จุดโฟกัส (Focus)',b:'ตำแหน่งใต้ดินที่หินเลื่อนตัวและปล่อยพลังงานออกมาเป็นคลื่นไหวสะเทือน'},{p:[0,1,0],t:'จุดเหนือศูนย์เกิด (Epicenter)',b:'ตำแหน่งบนผิวโลกที่อยู่เหนือจุดโฟกัสโดยตรง มักสั่นไหวแรงที่สุด'},{p:[0,.9,2.7],t:'รอยเลื่อน (Fault)',b:'รอยแตกที่ก้อนหินสองฝั่งเลื่อนผ่านกัน พลังงานสะสมก่อนเลื่อนตัว'}]}},
+function(v){const P=v[0];add(cn,0x5a4a3a,[0,1.6,0],[4.6,3.8,4.6]);add(cg,0x2a1a14,[0,3.45,0],[.9,.14,.9]);const ch=add(sg,0xff5a1a,[0,-1.6,0],[2.1,1.1,2.1],{emissive:0xff3a0a,emissiveIntensity:.8});add(cg,0xff6a2a,[0,.6,0],[.35,4.6,.35],{emissive:0xff4a10,emissiveIntensity:.6});add(bg,0x3a3028,[0,-1.7,0],[14,3.2,10],{transparent:true,opacity:.35,depthWrite:false});
+const N=44,ps=[];for(let i=0;i<N;i++){const q=add(sg,i%3?0x6b6b72:0xff8a3a,[0,3.5,0],[.16,.16,.16]);ps.push(q)}
+tk.push(t=>{const act=Math.round(P*4.2),H=1.2+P*.75;ch.scale.set(2.1+.05*Math.sin(t*5)*P/3,1.1,2.1);ps.forEach((q,i)=>{if(i>=act){q.visible=false;return}q.visible=true;const u=(t*.22+i/N)%1,a=i*2.4;q.position.set(Math.cos(a)*u*(.6+P*.18),3.5+u*H,Math.sin(a)*u*(.6+P*.18));q.scale.setScalar(.1+u*.25)})});
+return{cam:15,y:1.2,lg:[[0xff5a1a,'แมกมา'],[0x5a4a3a,'ตัวภูเขาไฟ'],[0x6b6b72,'เถ้าถ่าน']],an:[{p:[0,-1.6,0],t:'ห้องแมกมา',b:'แหล่งสะสมแมกมาใต้เปลือกโลก ความดันสะสมที่นี่ผลักให้แมกมาดันตัวขึ้น'},{p:[0,3.6,0],t:'ปล่องและปากปล่อง',b:'ทางออกของแมกมา ก๊าซ และเถ้าถ่าน'},{p:[1.4,5,0],t:'เถ้าถ่านและก๊าซ',b:'ลอยสูงตามความรุนแรงของการปะทุ เป็นอันตรายต่อการหายใจและการบิน'}]}},
+function(v){const d=v[0],s=Math.sqrt(d)*.05;const g=new THREE.PlaneGeometry(26,8,104,24);g.rotateX(-Math.PI/2);const sea=new THREE.Mesh(g,M(0x2a8cc4,{transparent:true,opacity:.82,roughness:.2}));sea.position.y=.2;G.add(sea);const pos=g.attributes.position,xs=[];for(let i=0;i<pos.count;i++)xs.push(pos.getX(i));
+add(bg,0x6a5a46,[-3,-1.2,0],[20,.8,8]);const sl=add(bg,0xd8c28a,[10.2,.1,0],[5,2.2,8]);
+tk.push(t=>{for(let i=0;i<pos.count;i++){const x=xs[i],k=(x+13)/26,A=.06+k*k*(1.4*(1-Math.min(d,4000)/5200)+.15);pos.setY(i,A*Math.sin(x*(.9+k*.7)-t*s*6))}pos.needsUpdate=true});
+return{cam:19,y:0,lg:[[0x2a8cc4,'น้ำทะเล'],[0xd8c28a,'ชายฝั่ง'],[0x6a5a46,'พื้นทะเล']],an:[{p:[-11,.3,0],t:'ต้นกำเนิดคลื่น',b:'มวลน้ำถูกแทนที่ เช่น แผ่นดินไหวใต้ทะเล ทำให้เกิดคลื่นยาวแผ่ออก'},{p:[-3,.6,0],t:'น้ำลึก',b:'คลื่นเดินทางเร็วมากแต่สูงไม่มาก เรือกลางทะเลแทบไม่รู้สึก'},{p:[8,2.4,0],t:'น้ำตื้นและชายฝั่ง',b:'ความเร็วลดลง แต่ความสูงเพิ่มขึ้นเร็ว จึงถาโถมใส่ฝั่ง'}]}},
+function(v){const ang=v[0]*Math.PI/180,rain=v[1],risk=v[0]*(1+rain*.07)>40;const sl=new THREE.Group();sl.position.set(-5,2,0);sl.rotation.z=-ang;G.add(sl);
+const dk=new THREE.Color(0x8a6a44).lerp(new THREE.Color(0x3a2a1a),rain/12);const sb=new THREE.Mesh(bg,M(dk));sb.scale.set(14,.6,6);sb.position.set(5,-.3,0);sl.add(sb);add(bg,0x3a3a40,[0,-1.2,0],[24,.6,10]);
+const bl=[];for(let i=0;i<6;i++){const b=new THREE.Mesh(bg,M(0x9a7a50));b.scale.set(1.4,.9,1.6);b.position.set(3+i*1.4,.75,(i%3-1)*1.7);b.castShadow=true;sl.add(b);bl.push(b)}
+const dr=[];for(let i=0;i<30;i++){const q=add(sg,0x8fd0ff,[0,0,0],[.06,.28,.06]);dr.push([q,Math.random()*12-6,Math.random()*6-3,Math.random()])}
+tk.push(t=>{const u=risk?Math.min(1,Math.max(0,((t%9)-1)/3.5)):0;bl.forEach((b,i)=>{b.position.x=3+i*1.4+u*u*(3+i*.2)});dr.forEach((r,i)=>{const q=r[0];if(i>=rain*3){q.visible=false;return}q.visible=true;const k=(t*.7+r[3])%1;q.position.set(r[1],7-k*7,r[2])})});
+return{cam:15,y:2,lg:[[0x8a6a44,'ดิน'],[0x8fd0ff,'ฝน'],[0x9a7a50,'มวลดิน']],an:[{p:[-2,4,0],t:'ความลาดชัน',b:'ยิ่งชันมาก แรงดึงดูดที่ดึงมวลดินลงตามแนวลาดยิ่งมาก'},{p:[3,3.8,0],t:'มวลดินและหิน',b:'เมื่อแรงเสียดทานไม่พอ มวลดินจะเคลื่อนตัวลงเป็นดินถล่ม'},{p:[0,7.2,0],t:'ฝนสะสม',b:'น้ำทำให้ดินอิ่มน้ำ หนักขึ้นและยึดเกาะน้อยลง'}]}},
+function(v){const w=v[0],col=w>=7;add(bg,0x7a5a3a,[0,1.25,0],[12,1.5,6],GL(.7));add(bg,0x9a9a9a,[0,-.75,0],[12,2.5,6],GL(.55));const cav=add(sg,0x1a1410,[0,-.4,0],[.4+w*.26,.3+w*.14,.4+w*.26]);add(bg,0x3a9ad4,[0,-1.4-w*.12,0],[12,.06,6],GL(.5));
+if(col)add(cg,0x1a1410,[0,2.02,0],[1.9,.04,1.9]);
+const dr=[];for(let i=0;i<6;i++)dr.push(add(sg,0x8fd0ff,[ -4+i*1.6,1,0],[.1,.1,.1]));
+tk.push(t=>{dr.forEach((q,i)=>{const k=(t*.5+i/6)%1;q.position.y=1.9-k*(1.9+1.4+w*.12)})});
+return{cam:14,y:0,lg:[[0x7a5a3a,'ชั้นดิน'],[0x9a9a9a,'หินปูน'],[0x3a9ad4,'ระดับน้ำใต้ดิน']],an:[{p:[0,1.2,3.2],t:'ชั้นดินด้านบน',b:'รับน้ำหนักอยู่เหนือโพรง ถ้าโพรงกว้างเกินไปจะพังลงมา'},{p:[0,-.4,3.2],t:'โพรงในหินปูน',b:'น้ำใต้ดินละลายและกัดเซาะหินปูนหรือโดโลไมต์ให้กลวง'},{p:[5.5,-1.4-w*.12,3.2],t:'ระดับน้ำใต้ดิน',b:'การสูบน้ำบาดาลเกินพิกัดทำให้ระดับลดลงและพื้นดินเสียแรงพยุง'}]}},
+function(v){const m=v[0],sx=3-(10-m)*.5;const land=add(bg,0xd8c28a,[(sx-13)/2-.5+.5,.2,0],[sx+13,1.1,9]);land.position.x=(-13+sx)/2;land.scale.x=sx+13;const g=new THREE.PlaneGeometry(26,10,60,20);g.rotateX(-Math.PI/2);const sea=new THREE.Mesh(g,M(0x2a8cc4,{transparent:true,opacity:.8,roughness:.2}));sea.position.set(0,.4,0);G.add(sea);const pos=g.attributes.position,xs=[];for(let i=0;i<pos.count;i++)xs.push(pos.getX(i));
+const nT=Math.round(m*1.3);for(let i=0;i<nT;i++){const x=sx-.4-(i%3)*.5,z=-4+(i*8.5/Math.max(nT,1));add(cg,0x5a3a20,[x,1.1,z],[.07,.9,.07]);add(cn,0x2f8a4a,[x,1.8,z],[.4,.8,.4])}
+tk.push(t=>{for(let i=0;i<pos.count;i++){const x=xs[i];pos.setY(i,.12*Math.sin(x*1.2-t*2)*(x>sx-6?1:.3))}pos.needsUpdate=true;sea.position.x=0});
+return{cam:16,y:0,lg:[[0xd8c28a,'ชายหาด'],[0x2a8cc4,'ทะเล'],[0x2f8a4a,'ป่าชายเลน']],an:[{p:[sx,1.4,4.6],t:'แนวชายฝั่ง',b:'ตำแหน่งนี้ถอยร่นเข้าฝั่งเมื่อคลื่นกัดเซาะมากกว่าตะกอนที่ถูกพัดมาเติม'},{p:[sx-.9,2.4,-1],t:'ป่าชายเลน',b:'ลดพลังงานคลื่น ยึดตะกอน และช่วยชะลอการกัดเซาะ'},{p:[sx+3,.9,0],t:'คลื่นและกระแสน้ำ',b:'พัดพาตะกอนออกจากชายหาด การสร้างเขื่อนหรือท่าเรือรบกวนการเคลื่อนที่ของตะกอน'}]}},
+function(v){const f=v[0];for(let i=0;i<9;i++)for(let j=0;j<9;j++){const h=.3+i*.35+((j*7+i*3)%5)*.04,c=h<f?0xe0524a:h<f+1?0xe8b84a:0x4aa86a;add(bg,c,[(i-4)*1.15,h/2,(j-4)*1.15],[1.05,h,1.05])}
+const sea=add(bg,0x2a8cc4,[-8.2,.15+f/2,0],[3,.3+f,11],GL(.55));
+tk.push(t=>{sea.position.y=(.15+f/2)+Math.sin(t*1.5)*.04});
+return{cam:16,y:1,lg:[[0xe0524a,'น้ำท่วม'],[0xe8b84a,'เฝ้าระวัง'],[0x4aa86a,'ปลอดภัย']],an:[{p:[-6,f+.8,0],t:'ระดับน้ำท่วม',b:'ปรับแถบเลื่อนเพื่อดูว่าพื้นที่ใดจมน้ำ'},{p:[4.6,3.8,0],t:'ที่สูงและศูนย์พักพิง',b:'ควรอพยพขึ้นที่สูงตามเส้นทางที่วางแผนไว้ล่วงหน้า'},{p:[0,3.4,0],t:'แผนที่ความเสี่ยง',b:'สีแสดงระดับความเสี่ยงของแต่ละพื้นที่ ใช้ตัดสินใจเส้นทางอพยพ'}]}}
+];
+render();
+</script></body></html>
